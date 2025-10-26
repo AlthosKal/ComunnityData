@@ -1,0 +1,98 @@
+    # Archivos y directorios de Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+mvnw
+mvnw.cmd
+
+# Archivos de desarrollo local
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Archivos de Git
+.git/
+.gitignore
+.gitattributes
+
+# Archivos de documentación
+README.md
+HELP.md
+*.md
+
+# Archivos de prueba y reportes
+coverage/
+.nyc_output/
+
+# Archivos temporales
+*.tmp
+*.temp
+*.cache
+
+# Archivos de backup
+*.bak
+*.backup
+
+# Archivos de imagen y media (no esenciales para el build)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+
+# Archivos de texto no esenciales
+*.txt
+DOM.txt
+Testing.png
+
+# Archivos de configuración de herramientas
+.editorconfig
+.prettierrc
+.eslintrc*
+.jshintrc
+.jscsrc
+
+# Archivos de dependencias locales
+node_modules/
+bower_components/
+
+# Archivos generados
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Archivos de IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Archivos de configuración de contenedores
+docker-compose.yml
+docker-compose.yaml
+docker-compose.*.yml
+docker-compose.*.yaml
+Dockerfile.*
+.dockerignore

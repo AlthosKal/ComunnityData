@@ -1,0 +1,28 @@
+services:
+# FRONT DE LA APLICACION
+  comunidata-ui:
+    image: yefff/image-frontend-comunidata-ui:1.0.0
+    container_name: ComunidataUi
+    ports:
+      - "80:80"
+    depends_on:
+      - comunidata-api
+    networks:
+      - comunidata-network
+    restart: unless-stopped
+# BACKEND DE LA APLICACION
+  comunidata-api:
+    image: yefff/image-backend-comunidata-api:1.0.0
+    container_name: ComunidataAPI
+    volumes:
+      - ./comunidata-api/.env.docker:/workspace/.env
+    env_file:
+      - ./comunidata-api/.env.docker
+    ports:
+      - "8080:8080"
+    networks:
+      - comunidata-network
+    restart: unless-stopped
+networks:
+  comunidata-network:
+    driver: bridge

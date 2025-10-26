@@ -1,0 +1,135 @@
+front-end:
+  web-url: ${WEB_URL}
+  mobile-url: ${MOBILE_URL}
+# Configuración Spring
+spring:
+  application:
+    name: ComuniData
+  main:
+    allow-bean-definition-overriding: true
+  data:
+    mongodb:
+      uri: ${DATABASE_URL}
+      auto-index-creation: true
+  ai:
+    openai:
+      api-key: ${OPENAI_KEY}
+      chat:
+        options:
+          model: ${OPENAI_MODEL}
+          temperature: 1
+    vectorstore:
+      mongodb:
+        collection-name: citizen_reports
+        path-name: embedding
+        initialize-schema: true
+        vector-index-name: report_embeddings_index
+    watsonx:
+      ai:
+        # API Key de IBM Cloud IAM
+        iam-token: ${IBM_WATSONX_API_KEY}
+        # O usa: i-a-m-token: ${IBM_WATSONX_API_KEY}
+
+        # Project ID de tu proyecto en watsonx
+        project-id: ${IBM_WATSONX_PROJECT_ID}
+
+        # Base URL según tu región
+        base-url: https://us-south.ml.cloud.ibm.com
+
+        # Endpoints de la API (opcionales, tienen valores por defecto)
+        text-endpoint: "/ml/v1/text/generation?version=2024-05-31"
+        stream-endpoint: "/ml/v1/text/generation_stream?version=2024-05-31"
+
+        # Opciones del chat
+        chat:
+          options:
+            model: ibm/granite-3.3-8b-instruct
+            temperature: 0.3
+            max-new-tokens: 300  # Nota: es max-new-tokens, no max-tokens
+            top-p: 0.9
+            top-k: 50
+            # Opciones adicionales disponibles:
+            # decoding-method: sample  # o greedy
+            # repetition-penalty: 1.0
+            # min-new-tokens: 1
+  cache:
+    type: caffeine
+
+# Configuración del servidor
+server:
+  port: 8080
+  error:
+    include-stacktrace: never
+  servlet:
+    context-path: /api
+
+# Configuración de actuator
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: never
+
+# Configuración para reportes
+app:
+  reports:
+    storage:
+      path: ./reports  # Carpeta dentro del proyecto
+    expiration:
+      hours: 24
+    # Configuración del sistema de gestión de reportes persistentes
+    directory: reports
+    expiration-days: 30
+    cleanup:
+      enabled: true
+      expiration-days: 30  # Eliminar reportes más antiguos que 30 días
+      mark-expired-days: 7  # Marcar como expirados después de 7 días
+      cron: "0 0 2 * * ?"  # Ejecutar limpieza diaria a las 2:00 AM
+    mark-expired:
+      cron: "0 0 0/6 * * ?"  # Marcar expirados cada 6 horas
+    stats:
+      cron: "0 0 * * * ?"  # Estadísticas cada hora
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        failure-rate-threshold: 50
+        sliding-window-size: 50
+        sliding-window-type: count_based
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 3s
+        permitted-number-of-calls-in-half-open-state: 5
+        register-health-indicator: true
+        record-exceptions:
+          - io.netty.handler.timeout.ReadTimeoutException
+          - java.lang.RuntimeException
+          - org.springframework.web.client.HttpServerErrorException
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+    instances:
+      app-resilience-config:
+        base-config: default
+
+  ratelimiter:
+    configs:
+      default:
+        limit-for-period: 100
+        limit-refresh-period: 1s
+        timeout-duration: 500ms
+    instances:
+      post-insert:
+        base-config: default
+
+# Configuración de logging
+logging:
+  level:
+    com.example.back_end.connector: INFO
+    com.example.back_end.service: INFO
+    org.springframework.web.reactive.function.client: INFO
+    org.springframework.ai: INFO
+    org.springframework: INFO

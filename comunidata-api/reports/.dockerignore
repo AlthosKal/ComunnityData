@@ -1,0 +1,7 @@
+# Ignorar todos los archivos de reportes generados
+*.pdf
+*.xlsx
+*.xls
+
+# Pero mantener el directorio
+!.gitignore
