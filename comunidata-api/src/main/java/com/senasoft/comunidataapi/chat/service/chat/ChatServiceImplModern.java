@@ -1,5 +1,7 @@
 package com.senasoft.comunidataapi.chat.service.chat;
 
+import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
+
 import com.senasoft.comunidataapi.chat.dto.request.*;
 import com.senasoft.comunidataapi.chat.dto.response.DynamicAnalysisResponseDTO;
 import com.senasoft.comunidataapi.chat.dto.response.StringChatResponseDTO;
@@ -8,11 +10,11 @@ import com.senasoft.comunidataapi.chat.dto.response.ai.SimpleTextResponseDTO;
 import com.senasoft.comunidataapi.chat.entity.ChatHistory;
 import com.senasoft.comunidataapi.chat.enums.ApiError;
 import com.senasoft.comunidataapi.chat.enums.Model;
-import com.senasoft.comunidataapi.exception.ComuniDataException;
 import com.senasoft.comunidataapi.chat.mapper.ChatHistoryForConversationMapper;
 import com.senasoft.comunidataapi.chat.mapper.ChatHistoryMapper;
 import com.senasoft.comunidataapi.chat.repository.AiHistoryRepository;
 import com.senasoft.comunidataapi.chat.service.function.list.*;
+import com.senasoft.comunidataapi.exception.ComuniDataException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,8 +30,6 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
-import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
 /**
  * Implementación moderna de ChatService usando Native Function Calling.
@@ -130,9 +130,7 @@ public class ChatServiceImplModern implements ChatService {
 
             BaseDynamicResponseDTO dynamicResponse =
                     new SimpleTextResponseDTO(
-                            "Respuesta del asistente",
-                            "Análisis de reportes ciudadanos",
-                            response);
+                            "Respuesta del asistente", "Análisis de reportes ciudadanos", response);
 
             return new DynamicAnalysisResponseDTO(stringResponse, dynamicResponse);
 
@@ -250,9 +248,7 @@ public class ChatServiceImplModern implements ChatService {
                 """;
     }
 
-    /**
-     * Maneja excepciones de manera inteligente.
-     */
+    /** Maneja excepciones de manera inteligente. */
     private ComuniDataException handleChatException(Exception e, ChatDTO dto) {
         Throwable rootCause = e;
         while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
@@ -261,7 +257,10 @@ public class ChatServiceImplModern implements ChatService {
 
         // Timeout
         if (rootCause instanceof io.netty.handler.timeout.ReadTimeoutException) {
-            log.warn("Timeout calling {} model for prompt: {}", Model.OPENAI.name(), dto.getPrompt());
+            log.warn(
+                    "Timeout calling {} model for prompt: {}",
+                    Model.OPENAI.name(),
+                    dto.getPrompt());
             return new ComuniDataException(
                     ApiError.AI_PROVIDER_TIMEOUT.getHttpStatus(),
                     ApiError.AI_PROVIDER_TIMEOUT.getMessage(),
@@ -275,7 +274,10 @@ public class ChatServiceImplModern implements ChatService {
         if (e instanceof org.springframework.web.client.ResourceAccessException
                 || rootCause instanceof java.net.ConnectException
                 || rootCause instanceof java.net.UnknownHostException) {
-            log.warn("Network error calling {} model: {}", Model.OPENAI.name(), rootCause.getMessage());
+            log.warn(
+                    "Network error calling {} model: {}",
+                    Model.OPENAI.name(),
+                    rootCause.getMessage());
             return new ComuniDataException(
                     ApiError.AI_PROVIDER_UNAVAILABLE.getHttpStatus(),
                     ApiError.AI_PROVIDER_UNAVAILABLE.getMessage(),
@@ -291,7 +293,9 @@ public class ChatServiceImplModern implements ChatService {
             return new ComuniDataException(
                     ApiError.BAD_FORMAT.getHttpStatus(),
                     ApiError.BAD_FORMAT.getMessage(),
-                    List.of("El mensaje no puede estar vacío", "Por favor proporciona una consulta válida"));
+                    List.of(
+                            "El mensaje no puede estar vacío",
+                            "Por favor proporciona una consulta válida"));
         }
 
         // Error genérico

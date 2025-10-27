@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 import '../../../core/controllers/ai_chat_controller.dart';
 import 'chat_message_widget.dart';
 import 'typing_indicator_widget.dart';

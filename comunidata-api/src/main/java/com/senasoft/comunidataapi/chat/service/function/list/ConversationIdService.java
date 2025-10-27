@@ -1,8 +1,7 @@
 package com.senasoft.comunidataapi.chat.service.function.list;
 
-import org.springframework.stereotype.Service;
-
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ConversationIdService {

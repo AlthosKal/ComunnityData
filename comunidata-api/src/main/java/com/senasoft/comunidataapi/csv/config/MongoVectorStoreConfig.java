@@ -5,12 +5,9 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.mongodb.atlas.MongoDBAtlasVectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
  * Configuración para MongoDB Atlas Vector Store y modelo de embeddings.
@@ -32,14 +29,13 @@ public class MongoVectorStoreConfig {
      */
     @Bean
     public EmbeddingModel embeddingModel() {
-        OpenAiApi openAiApi = OpenAiApi.builder()
-                .apiKey(openAiApiKey)
-                .build();
+        OpenAiApi openAiApi = OpenAiApi.builder().apiKey(openAiApiKey).build();
 
-        OpenAiEmbeddingOptions options = OpenAiEmbeddingOptions.builder()
-                .model("text-embedding-3-small")
-                .dimensions(1536)
-                .build();
+        OpenAiEmbeddingOptions options =
+                OpenAiEmbeddingOptions.builder()
+                        .model("text-embedding-3-small")
+                        .dimensions(1536)
+                        .build();
 
         return new OpenAiEmbeddingModel(openAiApi, MetadataMode.EMBED, options);
     }
@@ -48,6 +44,7 @@ public class MongoVectorStoreConfig {
      * NOTA: El VectorStore ahora se configura automáticamente por Spring AI.
      *
      * <p>La configuración se realiza mediante propiedades en application.yml:
+     *
      * <pre>
      * spring:
      *   ai:
@@ -61,11 +58,12 @@ public class MongoVectorStoreConfig {
      *
      * <p>IMPORTANTE: Antes de usar este VectorStore, debes crear un índice vectorial en MongoDB
      * Atlas:
+     *
      * <ol>
-     *   <li>Ve a tu cluster en MongoDB Atlas</li>
-     *   <li>Selecciona la base de datos</li>
-     *   <li>En la colección 'citizen_reports', crea un Search Index</li>
-     *   <li>Usa la siguiente configuración JSON:</li>
+     *   <li>Ve a tu cluster en MongoDB Atlas
+     *   <li>Selecciona la base de datos
+     *   <li>En la colección 'citizen_reports', crea un Search Index
+     *   <li>Usa la siguiente configuración JSON:
      * </ol>
      *
      * <pre>{@code

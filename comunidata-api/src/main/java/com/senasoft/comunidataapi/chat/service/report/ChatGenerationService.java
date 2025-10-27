@@ -1,5 +1,11 @@
 package com.senasoft.comunidataapi.chat.service.report;
 
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -12,13 +18,6 @@ import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.springframework.stereotype.Service;
-
-import java.awt.*;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 
 /** Servicio para generar gráficos en reportes usando JFreeChart */
 @Service

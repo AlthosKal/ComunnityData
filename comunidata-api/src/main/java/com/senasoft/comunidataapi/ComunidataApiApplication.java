@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 public class ComunidataApiApplication {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
         Dotenv dotenv = Dotenv.load();
 
         // Configuración de la base de datos MongoDB
@@ -27,7 +27,6 @@ public class ComunidataApiApplication {
         System.setProperty("IBM_WATSONX_API_KEY", dotenv.get("USER_IBM_API_KEY"));
         System.setProperty("IBM_WATSONX_PROJECT_ID", dotenv.get("PROJECT_IBM_ID"));
 
-		SpringApplication.run(ComunidataApiApplication.class, args);
-	}
-
+        SpringApplication.run(ComunidataApiApplication.class, args);
+    }
 }

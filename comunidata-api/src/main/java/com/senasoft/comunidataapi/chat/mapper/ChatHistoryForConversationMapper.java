@@ -12,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Mapper(componentModel = "spring")
 public abstract class ChatHistoryForConversationMapper {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ObjectMapper objectMapper;
 
     @Mapping(target = "response", source = "response", qualifiedByName = "objectToString")
     public abstract ChatHistoryForConversationDTO toDTO(ChatHistory chatHistory);

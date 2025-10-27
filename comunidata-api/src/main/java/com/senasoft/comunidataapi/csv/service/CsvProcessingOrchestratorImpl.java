@@ -1,6 +1,5 @@
 package com.senasoft.comunidataapi.csv.service;
 
-import com.senasoft.comunidataapi.csv.dto.response.BatchProcessingStatusDTO;
 import com.senasoft.comunidataapi.csv.dto.response.CitizenReportResponseDTO;
 import com.senasoft.comunidataapi.csv.dto.response.CsvUploadResponseDTO;
 import com.senasoft.comunidataapi.csv.entity.CitizenReport;
@@ -13,7 +12,6 @@ import com.senasoft.comunidataapi.csv.service.processing.GraniteProcessingServic
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
@@ -24,9 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Implementación del orquestador de procesamiento de CSV.
- */
+/** Implementación del orquestador de procesamiento de CSV. */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -70,7 +66,7 @@ public class CsvProcessingOrchestratorImpl implements CsvProcessingOrchestrator 
                                 .filter(
                                         r ->
                                                 !ProcessingStatus.ERROR.equals(
-                                                        r.getEstadoProcesamiento()))
+                                                        r.getProcessingStatus()))
                                 .collect(Collectors.toList());
 
                 registrosConError = processedReports.size() - validReports.size();
@@ -92,19 +88,19 @@ public class CsvProcessingOrchestratorImpl implements CsvProcessingOrchestrator 
                                     .filter(
                                             r ->
                                                     ProcessingStatus.ERROR.equals(
-                                                            r.getEstadoProcesamiento()))
+                                                            r.getProcessingStatus()))
                                     .collect(Collectors.toList());
                     repository.saveAll(errorReports);
                 }
             }
 
             return CsvUploadResponseDTO.builder()
-                    .mensaje("CSV procesado exitosamente")
-                    .totalRegistros(normalizedReports.size())
-                    .registrosNormalizados(normalizedReports.size())
-                    .registrosConError(registrosConError)
+                    .message("CSV procesado exitosamente")
+                    .totalRecords(normalizedReports.size())
+                    .normalizedRecords(normalizedReports.size())
+                    .recordsWithErros(registrosConError)
                     .batchId(batchId)
-                    .estadoProcesamiento(
+                    .processingStatus(
                             Boolean.TRUE.equals(procesarInmediatamente)
                                     ? "PROCESAMIENTO_COMPLETO"
                                     : "NORMALIZADO")
@@ -123,16 +119,6 @@ public class CsvProcessingOrchestratorImpl implements CsvProcessingOrchestrator 
     }
 
     @Override
-    public CitizenReportResponseDTO getReportById(String id) {
-        CitizenReport report =
-                repository
-                        .findById(id)
-                        .orElseThrow(
-                                () -> new RuntimeException("Reporte no encontrado con ID: " + id));
-        return mapper.toResponseDTO(report);
-    }
-
-    @Override
     public byte[] exportReportsAsCsv(List<String> reportIds) {
         List<CitizenReport> reports;
 
@@ -143,38 +129,6 @@ public class CsvProcessingOrchestratorImpl implements CsvProcessingOrchestrator 
         }
 
         return generateCsvBytes(reports);
-    }
-
-    @Override
-    public BatchProcessingStatusDTO getBatchStatus(String batchId) {
-        List<CitizenReport> batchReports = repository.findByBatchId(batchId);
-
-        if (batchReports.isEmpty()) {
-            throw new RuntimeException("Batch no encontrado: " + batchId);
-        }
-
-        long completados =
-                batchReports.stream()
-                        .filter(r -> ProcessingStatus.COMPLETADO.equals(r.getEstadoProcesamiento()))
-                        .count();
-
-        long conError =
-                batchReports.stream()
-                        .filter(r -> ProcessingStatus.ERROR.equals(r.getEstadoProcesamiento()))
-                        .count();
-
-        double porcentaje = (completados * 100.0) / batchReports.size();
-
-        return BatchProcessingStatusDTO.builder()
-                .batchId(batchId)
-                .totalRegistros(batchReports.size())
-                .registrosProcesados((int) (completados + conError))
-                .registrosCompletados((int) completados)
-                .registrosConError((int) conError)
-                .porcentajeCompletado(porcentaje)
-                .estadoGeneral(determineGeneralStatus(batchReports))
-                .tiempoEstimadoRestante(0L) // Implementar si se necesita
-                .build();
     }
 
     // ==================== Helper Methods ====================
@@ -192,58 +146,30 @@ public class CsvProcessingOrchestratorImpl implements CsvProcessingOrchestrator 
                 writer.printf(
                         "%s,%s,%s,\"%s\",%s,%s,%s,%s,%s,%s%n",
                         report.getId(),
-                        report.getEdad() != null ? report.getEdad() : "",
-                        report.getCiudad() != null ? report.getCiudad() : "",
-                        report.getComentario() != null
-                                ? report.getComentario().replace("\"", "\"\"")
+                        report.getAge() != null ? report.getAge() : "",
+                        report.getCity() != null ? report.getCity() : "",
+                        report.getComment() != null
+                                ? report.getComment().replace("\"", "\"\"")
                                 : "",
-                        report.getCategoriaProblema() != null
-                                ? report.getCategoriaProblema().getDisplayName()
+                        report.getCategoryProblem() != null
+                                ? report.getCategoryProblem().getDisplayName()
                                 : "",
-                        report.getNivelUrgencia() != null
-                                ? report.getNivelUrgencia().getDisplayName()
+                        report.getUrgencyLevel() != null
+                                ? report.getUrgencyLevel().getDisplayName()
                                 : "",
-                        report.getFechaReporte() != null
-                                ? report.getFechaReporte()
-                                        .format(DateTimeFormatter.ISO_LOCAL_DATE)
+                        report.getReportDate() != null
+                                ? report.getReportDate().format(DateTimeFormatter.ISO_LOCAL_DATE)
                                 : "",
-                        report.getAtencionPreviaGobierno() != null
-                                ? report.getAtencionPreviaGobierno()
+                        report.getGovernmentPreAttention() != null
+                                ? report.getGovernmentPreAttention()
                                 : "",
-                        report.getZona() != null ? report.getZona().getDisplayName() : "",
-                        report.getSesgoDetectado() != null ? report.getSesgoDetectado() : "");
+                        report.getArea() != null ? report.getArea().getDisplayName() : "",
+                        report.getBiasDetected() != null ? report.getBiasDetected() : "");
             }
 
             writer.flush();
         }
 
         return outputStream.toByteArray();
-    }
-
-    private String determineGeneralStatus(List<CitizenReport> reports) {
-        long completados =
-                reports.stream()
-                        .filter(r -> ProcessingStatus.COMPLETADO.equals(r.getEstadoProcesamiento()))
-                        .count();
-
-        if (completados == reports.size()) {
-            return "COMPLETADO";
-        }
-
-        long procesando =
-                reports.stream()
-                        .filter(
-                                r ->
-                                        !ProcessingStatus.COMPLETADO.equals(
-                                                        r.getEstadoProcesamiento())
-                                                && !ProcessingStatus.ERROR.equals(
-                                                        r.getEstadoProcesamiento()))
-                        .count();
-
-        if (procesando > 0) {
-            return "EN_PROGRESO";
-        }
-
-        return "COMPLETADO_CON_ERRORES";
     }
 }

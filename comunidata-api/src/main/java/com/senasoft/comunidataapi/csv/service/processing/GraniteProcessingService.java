@@ -6,8 +6,8 @@ import java.util.List;
 /**
  * Servicio para procesamiento de reportes ciudadanos con IBM Granite.
  *
- * <p>Procesa reportes en batches de 50, validando categorías y detectando sesgos usando IBM
- * Granite 3.3-8B-Instruct.
+ * <p>Procesa reportes en batches de 50, validando categorías y detectando sesgos usando IBM Granite
+ * 3.3-8B-Instruct.
  */
 public interface GraniteProcessingService {
 

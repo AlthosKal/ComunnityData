@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.concurrent.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.watsonx.WatsonxAiChatModel;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,16 +39,12 @@ public class GraniteProcessingServiceImpl implements GraniteProcessingService {
     private static final int PARALLEL_BATCHES = 3;
     private static final int THREAD_POOL_SIZE = 3;
 
-    private final ExecutorService executorService =
-            Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+    private final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
     @Override
     public List<CitizenReport> processReportsInBatches(
             List<CitizenReport> reports, String batchId) {
-        log.info(
-                "Starting batch processing for {} reports in batch {}",
-                reports.size(),
-                batchId);
+        log.info("Starting batch processing for {} reports in batch {}", reports.size(), batchId);
 
         // Dividir en batches de 50
         List<List<CitizenReport>> batches = partitionList(reports, BATCH_SIZE);
@@ -126,7 +121,7 @@ public class GraniteProcessingServiceImpl implements GraniteProcessingService {
 
             // Marcar como procesados
             reportBatch.forEach(
-                    report -> report.setEstadoProcesamiento(ProcessingStatus.PROCESANDO_IA));
+                    report -> report.setProcessingStatus(ProcessingStatus.PROCESANDO_IA));
 
             return reportBatch;
 
@@ -135,8 +130,8 @@ public class GraniteProcessingServiceImpl implements GraniteProcessingService {
             // Marcar reportes con error
             reportBatch.forEach(
                     report -> {
-                        report.setEstadoProcesamiento(ProcessingStatus.ERROR);
-                        report.setErrorMensaje("Error en procesamiento IA: " + e.getMessage());
+                        report.setProcessingStatus(ProcessingStatus.ERROR);
+                        report.setErrorMessage("Error en procesamiento IA: " + e.getMessage());
                     });
             return reportBatch;
         }
@@ -156,8 +151,8 @@ public class GraniteProcessingServiceImpl implements GraniteProcessingService {
         log.error("Circuit breaker activated. Fallback method called.", e);
         reportBatch.forEach(
                 report -> {
-                    report.setEstadoProcesamiento(ProcessingStatus.ERROR);
-                    report.setErrorMensaje(
+                    report.setProcessingStatus(ProcessingStatus.ERROR);
+                    report.setErrorMessage(
                             "Servicio de IA temporalmente no disponible. Reintentando...");
                 });
         return reportBatch;
@@ -181,9 +176,8 @@ public class GraniteProcessingServiceImpl implements GraniteProcessingService {
         prompt.append("CATEGORÍAS VÁLIDAS:\n");
         prompt.append("- Salud: problemas de salud pública, hospitales, medicamentos, etc.\n");
         prompt.append(
-                        "- Educación: problemas educativos, escuelas, profesores, infraestructura educativa.\n");
-        prompt.append(
-                        "- Medio Ambiente: contaminación, basuras, deforestación, agua, aire.\n");
+                "- Educación: problemas educativos, escuelas, profesores, infraestructura educativa.\n");
+        prompt.append("- Medio Ambiente: contaminación, basuras, deforestación, agua, aire.\n");
         prompt.append("- Seguridad: delincuencia, violencia, iluminación, policía.\n\n");
 
         prompt.append("SESGOS A DETECTAR:\n");
@@ -193,7 +187,7 @@ public class GraniteProcessingServiceImpl implements GraniteProcessingService {
         prompt.append("- Propaganda política\n\n");
 
         prompt.append(
-                        "Para cada reporte, responde ÚNICAMENTE con un array JSON (sin texto adicional). Cada objeto debe tener:\n");
+                "Para cada reporte, responde ÚNICAMENTE con un array JSON (sin texto adicional). Cada objeto debe tener:\n");
         prompt.append("- id: identificador del reporte\n");
         prompt.append("- sesgoDetectado: true/false\n");
         prompt.append("- descripcionSesgo: descripción del sesgo si existe, o null\n");
@@ -204,28 +198,26 @@ public class GraniteProcessingServiceImpl implements GraniteProcessingService {
         for (int i = 0; i < reports.size(); i++) {
             CitizenReport report = reports.get(i);
             prompt.append(String.format("%d. ID: %s\n", i + 1, report.getId()));
-            prompt.append(String.format("   Comentario: %s\n", report.getComentario()));
+            prompt.append(String.format("   Comentario: %s\n", report.getComment()));
             prompt.append(
                     String.format(
                             "   Categoría sugerida: %s\n",
-                            report.getCategoriaProblema() != null
-                                    ? report.getCategoriaProblema().getDisplayName()
+                            report.getCategoryProblem() != null
+                                    ? report.getCategoryProblem().getDisplayName()
                                     : "No especificada"));
-            prompt.append(String.format("   Ciudad: %s\n", report.getCiudad()));
+            prompt.append(String.format("   Ciudad: %s\n", report.getCity()));
             prompt.append("\n");
         }
 
         prompt.append(
-                        "\nResponde SOLO con el array JSON, sin explicaciones adicionales. Formato: [{\"id\":\"...\", \"sesgoDetectado\":true, \"descripcionSesgo\":\"...\", \"categoriaValidada\":\"Salud\", \"esReporteLegitimo\":true}, ...]\n");
+                "\nResponde SOLO con el array JSON, sin explicaciones adicionales. Formato: [{\"id\":\"...\", \"sesgoDetectado\":true, \"descripcionSesgo\":\"...\", \"categoriaValidada\":\"Salud\", \"esReporteLegitimo\":true}, ...]\n");
 
         return prompt.toString();
     }
 
     // ==================== Response Parsing ====================
 
-    /**
-     * Parsea la respuesta JSON de IBM Granite.
-     */
+    /** Parsea la respuesta JSON de IBM Granite. */
     private List<Map<String, Object>> parseGraniteResponse(String response) {
         try {
             // Limpiar la respuesta de posible texto adicional
@@ -239,9 +231,7 @@ public class GraniteProcessingServiceImpl implements GraniteProcessingService {
         }
     }
 
-    /**
-     * Extrae el array JSON de la respuesta, ignorando texto adicional.
-     */
+    /** Extrae el array JSON de la respuesta, ignorando texto adicional. */
     private String extractJsonArray(String response) {
         int startIndex = response.indexOf('[');
         int endIndex = response.lastIndexOf(']');
@@ -254,9 +244,7 @@ public class GraniteProcessingServiceImpl implements GraniteProcessingService {
         return response.trim();
     }
 
-    /**
-     * Actualiza los reportes con las validaciones de Granite.
-     */
+    /** Actualiza los reportes con las validaciones de Granite. */
     private void updateReportsWithValidations(
             List<CitizenReport> reports, List<Map<String, Object>> validations) {
 
@@ -268,14 +256,13 @@ public class GraniteProcessingServiceImpl implements GraniteProcessingService {
                     .ifPresent(
                             validation -> {
                                 // Actualizar sesgo
-                                Boolean sesgoDetectado =
-                                        (Boolean) validation.get("sesgoDetectado");
-                                report.setSesgoDetectado(
+                                Boolean sesgoDetectado = (Boolean) validation.get("sesgoDetectado");
+                                report.setBiasDetected(
                                         sesgoDetectado != null ? sesgoDetectado : false);
 
                                 String descripcionSesgo =
                                         (String) validation.get("descripcionSesgo");
-                                report.setDescripcionSesgo(descripcionSesgo);
+                                report.setDescriptionBias(descripcionSesgo);
 
                                 // Actualizar categoría validada
                                 String categoriaValidada =
@@ -284,16 +271,15 @@ public class GraniteProcessingServiceImpl implements GraniteProcessingService {
                                     ProblemCategory categoria =
                                             ProblemCategory.fromString(categoriaValidada);
                                     if (categoria != null) {
-                                        report.setCategoriaProblema(categoria);
+                                        report.setCategoryProblem(categoria);
                                     }
                                 }
 
                                 // Verificar legitimidad
-                                Boolean esLegitimo =
-                                        (Boolean) validation.get("esReporteLegitimo");
+                                Boolean esLegitimo = (Boolean) validation.get("esReporteLegitimo");
                                 if (esLegitimo != null && !esLegitimo) {
-                                    report.setEstadoProcesamiento(ProcessingStatus.ERROR);
-                                    report.setErrorMensaje("Reporte marcado como no legítimo");
+                                    report.setProcessingStatus(ProcessingStatus.ERROR);
+                                    report.setErrorMessage("Reporte marcado como no legítimo");
                                 }
                             });
         }
@@ -301,15 +287,12 @@ public class GraniteProcessingServiceImpl implements GraniteProcessingService {
 
     // ==================== Utility Methods ====================
 
-    /**
-     * Divide una lista en sublistas de tamaño específico.
-     */
+    /** Divide una lista en sublistas de tamaño específico. */
     private <T> List<List<T>> partitionList(List<T> list, int partitionSize) {
         List<List<T>> partitions = new ArrayList<>();
         for (int i = 0; i < list.size(); i += partitionSize) {
             partitions.add(
-                    new ArrayList<>(
-                            list.subList(i, Math.min(i + partitionSize, list.size()))));
+                    new ArrayList<>(list.subList(i, Math.min(i + partitionSize, list.size()))));
         }
         return partitions;
     }

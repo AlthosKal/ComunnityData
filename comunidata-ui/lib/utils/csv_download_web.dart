@@ -1,6 +1,6 @@
-import 'dart:typed_data';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
+import 'dart:typed_data';
 
 /// Implementación web para descarga de archivos usando dart:html
 void downloadFile(Uint8List bytes, String fileName) {

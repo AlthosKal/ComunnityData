@@ -5,9 +5,7 @@ import com.senasoft.comunidataapi.csv.entity.CitizenReport;
 import java.io.InputStream;
 import java.util.List;
 
-/**
- * Servicio para normalización de datos CSV de reportes ciudadanos.
- */
+/** Servicio para normalización de datos CSV de reportes ciudadanos. */
 public interface CsvNormalizationService {
 
     /**

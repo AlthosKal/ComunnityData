@@ -1,8 +1,11 @@
 package com.senasoft.comunidataapi.chat.service.report;
 
 import com.senasoft.comunidataapi.chat.dto.response.ai.BaseDynamicResponseDTO;
-import com.senasoft.comunidataapi.chat.dto.response.ai.SimpleTextResponseDTO;
 import com.senasoft.comunidataapi.chat.service.factory.DynamicResponseFactory;
+import java.io.File;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
@@ -12,19 +15,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * Implementación del servicio de generación de reportes.
  *
- * <p>NOTA: Esta implementación es un stub básico. Para generación de reportes ciudadanos,
- * utiliza {@link CitizenReportGenerationService} que proporciona funcionalidad completa
- * con análisis de IA, gráficos y métricas detalladas.
+ * <p>NOTA: Esta implementación es un stub básico. Para generación de reportes ciudadanos, utiliza
+ * {@link CitizenReportGenerationService} que proporciona funcionalidad completa con análisis de IA,
+ * gráficos y métricas detalladas.
  *
  * <p>Este servicio se mantiene para compatibilidad con la interfaz {@link ReportGenerationService}
  * utilizada en otros componentes del sistema.
@@ -40,8 +36,8 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
     /**
      * Genera una respuesta indicando que el reporte está siendo procesado.
      *
-     * <p>TODO: Implementar generación de reportes según las necesidades del sistema ComuniData.
-     * Por ahora, se recomienda usar CitizenReportGenerationService para reportes ciudadanos.
+     * <p>TODO: Implementar generación de reportes según las necesidades del sistema ComuniData. Por
+     * ahora, se recomienda usar CitizenReportGenerationService para reportes ciudadanos.
      *
      * @param prompt Prompt del usuario
      * @param functionName Nombre de la función que solicita el reporte
@@ -53,15 +49,18 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
     public BaseDynamicResponseDTO generateReportResponse(
             String prompt, String functionName, Object data, String reportType) {
 
-        log.info("Solicitud de generación de reporte - Función: {}, Tipo: {}", functionName, reportType);
+        log.info(
+                "Solicitud de generación de reporte - Función: {}, Tipo: {}",
+                functionName,
+                reportType);
 
         // Por ahora, retornar una respuesta simple
-        String message = String.format(
-            "La generación de reportes de tipo '%s' está en desarrollo. " +
-            "Para reportes de análisis ciudadano, el sistema utiliza el servicio especializado. " +
-            "Función solicitada: %s",
-            reportType, functionName
-        );
+        String message =
+                String.format(
+                        "La generación de reportes de tipo '%s' está en desarrollo. "
+                                + "Para reportes de análisis ciudadano, el sistema utiliza el servicio especializado. "
+                                + "Función solicitada: %s",
+                        reportType, functionName);
 
         return responseFactory.createSimpleTextResponse(prompt, message);
     }
@@ -103,21 +102,21 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
 
         Resource resource = new FileSystemResource(reportFile);
 
-        MediaType mediaType = "PDF".equalsIgnoreCase(metadata.getReportType())
-            ? MediaType.APPLICATION_PDF
-            : MediaType.APPLICATION_OCTET_STREAM;
+        MediaType mediaType =
+                "PDF".equalsIgnoreCase(metadata.getReportType())
+                        ? MediaType.APPLICATION_PDF
+                        : MediaType.APPLICATION_OCTET_STREAM;
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                       "attachment; filename=\"" + metadata.getFileName() + "\"")
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + metadata.getFileName() + "\"")
                 .contentType(mediaType)
                 .contentLength(reportFile.length())
                 .body(resource);
     }
 
-    /**
-     * Clase interna para almacenar metadata de reportes generados.
-     */
+    /** Clase interna para almacenar metadata de reportes generados. */
     private static class ReportMetadata {
         private final String reportId;
         private final String filePath;

@@ -1,9 +1,8 @@
 package com.senasoft.comunidataapi.exception;
 
 import com.senasoft.comunidataapi.chat.enums.ApiError;
-import org.springframework.http.HttpStatus;
-
 import java.util.List;
+import org.springframework.http.HttpStatus;
 
 public class ComuniDataException extends RuntimeException {
     private HttpStatus status;

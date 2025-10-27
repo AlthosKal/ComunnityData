@@ -1,10 +1,9 @@
 package com.senasoft.comunidataapi.chat.entity;
 
+import java.time.LocalDateTime;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDateTime;
 
 @Builder
 @Getter

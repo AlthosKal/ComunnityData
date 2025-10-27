@@ -21,10 +21,12 @@ public class FilterByReportDateFunction
     @JsonClassDescription("Request para filtrar reportes por rango de fechas")
     public record Request(
             @JsonProperty(required = true, value = "startDate")
-                    @JsonPropertyDescription("Fecha de inicio en formato YYYY-MM-DD (ej: '2023-01-01')")
+                    @JsonPropertyDescription(
+                            "Fecha de inicio en formato YYYY-MM-DD (ej: '2023-01-01')")
                     String startDate,
             @JsonProperty(required = true, value = "endDate")
-                    @JsonPropertyDescription("Fecha de fin en formato YYYY-MM-DD (ej: '2023-12-31')")
+                    @JsonPropertyDescription(
+                            "Fecha de fin en formato YYYY-MM-DD (ej: '2023-12-31')")
                     String endDate) {}
 
     @Override

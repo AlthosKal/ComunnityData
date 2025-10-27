@@ -50,8 +50,6 @@ public class SemanticSearchFunction
         List<Document> results = vectorStore.similaritySearch(searchRequest);
 
         // Extraer IDs de los documentos desde metadata
-        return results.stream()
-                .map(doc -> doc.getId())
-                .collect(Collectors.toList());
+        return results.stream().map(doc -> doc.getId()).collect(Collectors.toList());
     }
 }

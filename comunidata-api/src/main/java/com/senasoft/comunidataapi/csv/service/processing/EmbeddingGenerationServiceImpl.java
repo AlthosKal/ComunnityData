@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.stereotype.Service;
@@ -38,17 +37,15 @@ public class EmbeddingGenerationServiceImpl implements EmbeddingGenerationServic
                 processedReports.add(processedReport);
             } catch (Exception e) {
                 log.error("Error generating embedding for report {}", report.getId(), e);
-                report.setEstadoProcesamiento(ProcessingStatus.ERROR);
-                report.setErrorMensaje("Error generando embedding: " + e.getMessage());
+                report.setProcessingStatus(ProcessingStatus.ERROR);
+                report.setErrorMessage("Error generando embedding: " + e.getMessage());
                 processedReports.add(report);
             }
         }
 
         log.info(
                 "Successfully generated embeddings for {}/{} reports",
-                processedReports.stream()
-                        .filter(r -> r.getEmbedding() != null)
-                        .count(),
+                processedReports.stream().filter(r -> r.getEmbedding() != null).count(),
                 reports.size());
 
         return processedReports;
@@ -59,16 +56,16 @@ public class EmbeddingGenerationServiceImpl implements EmbeddingGenerationServic
     @Retry(name = "app-resilience-config")
     public CitizenReport generateEmbedding(CitizenReport report) {
         // Validar que el comentario existe
-        if (report.getComentario() == null || report.getComentario().trim().isEmpty()) {
+        if (report.getComment() == null || report.getComment().trim().isEmpty()) {
             log.warn("Report {} has no comment, skipping embedding generation", report.getId());
-            report.setEstadoProcesamiento(ProcessingStatus.ERROR);
-            report.setErrorMensaje("No hay comentario para generar embedding");
+            report.setProcessingStatus(ProcessingStatus.ERROR);
+            report.setErrorMessage("No hay comentario para generar embedding");
             return report;
         }
 
         try {
             // Actualizar estado
-            report.setEstadoProcesamiento(ProcessingStatus.GENERANDO_EMBEDDINGS);
+            report.setProcessingStatus(ProcessingStatus.GENERANDO_EMBEDDINGS);
 
             // Crear documento con metadatos para mejor contexto
             String textToEmbed = buildEmbeddingText(report);
@@ -86,7 +83,7 @@ public class EmbeddingGenerationServiceImpl implements EmbeddingGenerationServic
 
                 // Guardar embedding en el reporte
                 report.setEmbedding(embedding);
-                report.setEstadoProcesamiento(ProcessingStatus.COMPLETADO);
+                report.setProcessingStatus(ProcessingStatus.COMPLETADO);
 
                 log.debug(
                         "Generated embedding for report {} with {} dimensions",
@@ -98,8 +95,8 @@ public class EmbeddingGenerationServiceImpl implements EmbeddingGenerationServic
 
         } catch (Exception e) {
             log.error("Error generating embedding for report {}", report.getId(), e);
-            report.setEstadoProcesamiento(ProcessingStatus.ERROR);
-            report.setErrorMensaje("Error generando embedding: " + e.getMessage());
+            report.setProcessingStatus(ProcessingStatus.ERROR);
+            report.setErrorMessage("Error generando embedding: " + e.getMessage());
         }
 
         return report;
@@ -108,10 +105,9 @@ public class EmbeddingGenerationServiceImpl implements EmbeddingGenerationServic
     // ==================== Fallback Methods ====================
 
     public CitizenReport generateEmbeddingFallback(CitizenReport report, Exception e) {
-        log.error(
-                "Circuit breaker activated for embedding generation. Fallback method called.", e);
-        report.setEstadoProcesamiento(ProcessingStatus.ERROR);
-        report.setErrorMensaje("Servicio de embeddings temporalmente no disponible");
+        log.error("Circuit breaker activated for embedding generation. Fallback method called.", e);
+        report.setProcessingStatus(ProcessingStatus.ERROR);
+        report.setErrorMessage("Servicio de embeddings temporalmente no disponible");
         return report;
     }
 
@@ -126,19 +122,23 @@ public class EmbeddingGenerationServiceImpl implements EmbeddingGenerationServic
         StringBuilder text = new StringBuilder();
 
         // Comentario principal (más peso en el embedding)
-        text.append(report.getComentario());
+        text.append(report.getComment());
 
         // Agregar contexto adicional
-        if (report.getCategoriaProblema() != null) {
-            text.append(" [Categoría: ").append(report.getCategoriaProblema().getDisplayName()).append("]");
+        if (report.getCategoryProblem() != null) {
+            text.append(" [Categoría: ")
+                    .append(report.getCategoryProblem().getDisplayName())
+                    .append("]");
         }
 
-        if (report.getCiudad() != null) {
-            text.append(" [Ciudad: ").append(report.getCiudad()).append("]");
+        if (report.getCity() != null) {
+            text.append(" [Ciudad: ").append(report.getCity()).append("]");
         }
 
-        if (report.getNivelUrgencia() != null) {
-            text.append(" [Urgencia: ").append(report.getNivelUrgencia().getDisplayName()).append("]");
+        if (report.getUrgencyLevel() != null) {
+            text.append(" [Urgencia: ")
+                    .append(report.getUrgencyLevel().getDisplayName())
+                    .append("]");
         }
 
         return text.toString();

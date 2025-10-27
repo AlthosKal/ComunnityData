@@ -5,9 +5,7 @@ import com.senasoft.comunidataapi.csv.entity.CitizenReport;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
-/**
- * Mapper para convertir entre CitizenReport entity y DTOs.
- */
+/** Mapper para convertir entre CitizenReport entity y DTOs. */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CitizenReportMapper {
 

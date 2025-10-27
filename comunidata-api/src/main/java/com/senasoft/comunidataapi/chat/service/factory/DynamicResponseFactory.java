@@ -2,12 +2,12 @@ package com.senasoft.comunidataapi.chat.service.factory;
 
 import com.senasoft.comunidataapi.chat.dto.response.CharDataDTO;
 import com.senasoft.comunidataapi.chat.dto.response.ai.*;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 /**
- * Factory para crear respuestas dinámicas basadas en diferentes tipos de datos del sistema ComuniData.
+ * Factory para crear respuestas dinámicas basadas en diferentes tipos de datos del sistema
+ * ComuniData.
  *
  * <p>Esta clase se encarga de transformar datos en respuestas estructuradas que pueden ser
  * consumidas por el frontend, incluyendo gráficos, reportes y análisis de datos ciudadanos.
@@ -45,7 +45,8 @@ public class DynamicResponseFactory {
             List<CharDataDTO> chartData,
             String xAxisLabel,
             String yAxisLabel) {
-        return new ChartDataResponseDTO(title, analysis, chartType, chartData, xAxisLabel, yAxisLabel);
+        return new ChartDataResponseDTO(
+                title, analysis, chartType, chartData, xAxisLabel, yAxisLabel);
     }
 
     /**
@@ -58,19 +59,16 @@ public class DynamicResponseFactory {
      * @return Respuesta DTO con información del reporte
      */
     public BaseDynamicResponseDTO createReportDownloadResponse(
-            String title,
-            String description,
-            String downloadUrl,
-            String fileFormat) {
+            String title, String description, String downloadUrl, String fileFormat) {
         return new ReportDownloadResponseDTO(
-                title,                              // summary
-                description,                        // analysis
-                downloadUrl,                        // reportId (usando URL como ID)
+                title, // summary
+                description, // analysis
+                downloadUrl, // reportId (usando URL como ID)
                 "reporte_ciudadano." + fileFormat.toLowerCase(), // fileName
-                fileFormat,                         // reportType
-                "CITIZEN_ANALYSIS",                 // reportCategory
-                0L,                                 // fileSizeBytes (desconocido por ahora)
-                null                                // expirationDate (sin expiración por defecto)
-        );
+                fileFormat, // reportType
+                "CITIZEN_ANALYSIS", // reportCategory
+                0L, // fileSizeBytes (desconocido por ahora)
+                null // expirationDate (sin expiración por defecto)
+                );
     }
 }

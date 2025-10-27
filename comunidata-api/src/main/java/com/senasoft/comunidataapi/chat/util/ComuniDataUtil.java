@@ -1,11 +1,10 @@
 package com.senasoft.comunidataapi.chat.util;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import org.springframework.web.multipart.MultipartFile;
 
 public class ComuniDataUtil {
     public static String convertFilesToString(String[] files) throws IOException {

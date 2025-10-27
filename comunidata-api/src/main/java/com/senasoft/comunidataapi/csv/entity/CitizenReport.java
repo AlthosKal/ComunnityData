@@ -32,40 +32,40 @@ public class CitizenReport {
     @Id private String id;
 
     // Campos normalizados del CSV
-    private Integer edad;
+    private Integer age;
 
-    @Indexed private String ciudad;
+    @Indexed private String city;
 
-    private String comentario;
+    private String comment;
 
-    @Indexed private ProblemCategory categoriaProblema;
+    @Indexed private ProblemCategory categoryProblem;
 
-    private UrgencyLevel nivelUrgencia;
+    private UrgencyLevel urgencyLevel;
 
-    @Indexed private LocalDate fechaReporte;
+    @Indexed private LocalDate reportDate;
 
-    private Boolean atencionPreviaGobierno;
+    private Boolean governmentPreAttention;
 
-    @Indexed private Zone zona;
+    @Indexed private Zone area;
 
     // Campos de procesamiento IA
-    @Indexed private Boolean sesgoDetectado;
+    @Indexed private Boolean biasDetected;
 
-    private String descripcionSesgo;
+    private String descriptionBias;
 
-    private String categoriaOriginal; // Categoría antes de validación de IA
+    private String originalCategory; // Categoría antes de validación de IA
 
     // Vector embedding para RAG (text-embedding-3-small genera 1536 dimensiones)
     private List<Double> embedding;
 
     // Control de procesamiento
-    @Indexed private ProcessingStatus estadoProcesamiento;
+    @Indexed private ProcessingStatus processingStatus;
 
-    @Indexed private LocalDateTime fechaCarga;
+    @Indexed private LocalDateTime importDate;
 
-    private LocalDateTime fechaProcesamiento;
+    private LocalDateTime processDate;
 
-    private String errorMensaje;
+    private String errorMessage;
 
     // Metadatos adicionales
     private String batchId; // ID del batch de procesamiento
@@ -73,5 +73,5 @@ public class CitizenReport {
     private Integer batchIndex; // Posición en el batch
 
     // Campos raw para auditoría (opcional)
-    private String comentarioOriginal; // Comentario antes de normalización
+    private String originalComment; // Comentario antes de normalización
 }

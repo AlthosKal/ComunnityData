@@ -11,9 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -74,7 +72,9 @@ public class CitizenReportGenerationService {
             String fileName =
                     String.format(
                             "reporte_comunidata_%s_%s.pdf",
-                            analysisType, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")));
+                            analysisType,
+                            LocalDateTime.now()
+                                    .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")));
             String filePath = reportsStoragePath + File.separator + fileName;
 
             // Generar análisis dinámico con GPT-5
@@ -120,9 +120,7 @@ public class CitizenReportGenerationService {
 
     // ==================== Análisis con IA ====================
 
-    /**
-     * Genera análisis dinámico usando GPT-5.
-     */
+    /** Genera análisis dinámico usando GPT-5. */
     private String generateAiAnalysis(
             List<CitizenReport> reports, String analysisType, String userPrompt) {
 
@@ -130,7 +128,7 @@ public class CitizenReportGenerationService {
 
         promptBuilder.append("Eres un analista experto en datos de reportes ciudadanos. ");
         promptBuilder.append(
-                        "Genera un análisis ejecutivo profesional y conciso basado en los siguientes datos:\n\n");
+                "Genera un análisis ejecutivo profesional y conciso basado en los siguientes datos:\n\n");
 
         // Agregar contexto del usuario
         promptBuilder.append("SOLICITUD DEL USUARIO: ").append(userPrompt).append("\n\n");
@@ -142,19 +140,28 @@ public class CitizenReportGenerationService {
         // Distribución por categoría
         Map<String, Long> byCategory =
                 reports.stream()
-                        .filter(r -> r.getCategoriaProblema() != null)
+                        .filter(r -> r.getCategoryProblem() != null)
                         .collect(
                                 Collectors.groupingBy(
-                                        r -> r.getCategoriaProblema().getDisplayName(),
+                                        r -> r.getCategoryProblem().getDisplayName(),
                                         Collectors.counting()));
         promptBuilder.append("- Distribución por categoría:\n");
-        byCategory.forEach((cat, count) -> promptBuilder.append("  * ").append(cat).append(": ").append(count).append("\n"));
+        byCategory.forEach(
+                (cat, count) ->
+                        promptBuilder
+                                .append("  * ")
+                                .append(cat)
+                                .append(": ")
+                                .append(count)
+                                .append("\n"));
 
         // Distribución por ciudad (top 5)
         Map<String, Long> byCity =
                 reports.stream()
-                        .filter(r -> r.getCiudad() != null)
-                        .collect(Collectors.groupingBy(CitizenReport::getCiudad, Collectors.counting()));
+                        .filter(r -> r.getCity() != null)
+                        .collect(
+                                Collectors.groupingBy(
+                                        CitizenReport::getCity, Collectors.counting()));
         promptBuilder.append("- Ciudades con más reportes (top 5):\n");
         byCity.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
@@ -171,10 +178,10 @@ public class CitizenReportGenerationService {
         // Nivel de urgencia
         Map<String, Long> byUrgency =
                 reports.stream()
-                        .filter(r -> r.getNivelUrgencia() != null)
+                        .filter(r -> r.getUrgencyLevel() != null)
                         .collect(
                                 Collectors.groupingBy(
-                                        r -> r.getNivelUrgencia().getDisplayName(),
+                                        r -> r.getUrgencyLevel().getDisplayName(),
                                         Collectors.counting()));
         promptBuilder.append("- Distribución por urgencia:\n");
         byUrgency.forEach(
@@ -186,8 +193,7 @@ public class CitizenReportGenerationService {
                                 .append(count)
                                 .append("\n"));
 
-        promptBuilder.append(
-                        "\nGENERA UN ANÁLISIS EJECUTIVO que incluya:\n");
+        promptBuilder.append("\nGENERA UN ANÁLISIS EJECUTIVO que incluya:\n");
         promptBuilder.append("1. Hallazgos principales (2-3 puntos clave)\n");
         promptBuilder.append("2. Áreas de mayor preocupación\n");
         promptBuilder.append("3. Recomendaciones de acción prioritaria\n");
@@ -209,29 +215,27 @@ public class CitizenReportGenerationService {
                 reports.size(),
                 "porCategoria",
                 reports.stream()
-                        .filter(r -> r.getCategoriaProblema() != null)
+                        .filter(r -> r.getCategoryProblem() != null)
                         .collect(
                                 Collectors.groupingBy(
-                                        r -> r.getCategoriaProblema().getDisplayName(),
+                                        r -> r.getCategoryProblem().getDisplayName(),
                                         Collectors.counting())),
                 "porUrgencia",
                 reports.stream()
-                        .filter(r -> r.getNivelUrgencia() != null)
+                        .filter(r -> r.getUrgencyLevel() != null)
                         .collect(
                                 Collectors.groupingBy(
-                                        r -> r.getNivelUrgencia().getDisplayName(),
+                                        r -> r.getUrgencyLevel().getDisplayName(),
                                         Collectors.counting())),
                 "sinAtencionGobierno",
                 reports.stream()
                         .filter(
                                 r ->
-                                        r.getAtencionPreviaGobierno() != null
-                                                && !r.getAtencionPreviaGobierno())
+                                        r.getGovernmentPreAttention() != null
+                                                && !r.getGovernmentPreAttention())
                         .count(),
                 "conSesgos",
-                reports.stream()
-                        .filter(r -> Boolean.TRUE.equals(r.getSesgoDetectado()))
-                        .count());
+                reports.stream().filter(r -> Boolean.TRUE.equals(r.getBiasDetected())).count());
     }
 
     // ==================== Generación de PDF ====================
@@ -250,9 +254,7 @@ public class CitizenReportGenerationService {
                 new Paragraph(
                         "Generado el "
                                 + LocalDateTime.now()
-                                        .format(
-                                                DateTimeFormatter.ofPattern(
-                                                        "dd/MM/yyyy HH:mm:ss")),
+                                        .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
                         subtitleFont);
         subtitle.setAlignment(Element.ALIGN_CENTER);
         subtitle.setSpacingAfter(20);
@@ -334,9 +336,7 @@ public class CitizenReportGenerationService {
         }
     }
 
-    /**
-     * Agrega sección de gráficos visuales al reporte.
-     */
+    /** Agrega sección de gráficos visuales al reporte. */
     private void addChartsSection(Document document, List<CitizenReport> reports)
             throws DocumentException {
         Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, PRIMARY_COLOR);
@@ -397,7 +397,7 @@ public class CitizenReportGenerationService {
 
             // Si hay suficientes datos de fechas, agregar tendencia temporal
             long reportsWithDates =
-                    reports.stream().filter(r -> r.getFechaReporte() != null).count();
+                    reports.stream().filter(r -> r.getReportDate() != null).count();
             if (reportsWithDates > 5) {
                 byte[] trendChart = chartService.generateTimeTrendChart(reports);
                 Image trendImage = Image.getInstance(trendChart);
@@ -447,28 +447,28 @@ public class CitizenReportGenerationService {
                 .limit(20)
                 .forEach(
                         report -> {
-                            addCellToTable(table, report.getCiudad(), false);
+                            addCellToTable(table, report.getCity(), false);
                             addCellToTable(
                                     table,
-                                    report.getCategoriaProblema() != null
-                                            ? report.getCategoriaProblema().getDisplayName()
+                                    report.getCategoryProblem() != null
+                                            ? report.getCategoryProblem().getDisplayName()
                                             : "N/A",
                                     false);
-                            String comentario = report.getComentario();
+                            String comentario = report.getComment();
                             if (comentario != null && comentario.length() > 80) {
                                 comentario = comentario.substring(0, 77) + "...";
                             }
                             addCellToTable(table, comentario, false);
                             addCellToTable(
                                     table,
-                                    report.getNivelUrgencia() != null
-                                            ? report.getNivelUrgencia().getDisplayName()
+                                    report.getUrgencyLevel() != null
+                                            ? report.getUrgencyLevel().getDisplayName()
                                             : "N/A",
                                     false);
                             addCellToTable(
                                     table,
-                                    report.getZona() != null
-                                            ? report.getZona().getDisplayName()
+                                    report.getArea() != null
+                                            ? report.getArea().getDisplayName()
                                             : "N/A",
                                     false);
                         });

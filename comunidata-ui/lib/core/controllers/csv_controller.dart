@@ -1,11 +1,10 @@
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
-import '../services/csv_service.dart';
 
 // Import condicional para descarga de archivos
-import '../../widgets/utils/csv_download_stub.dart'
+import '../../utils/csv_download_stub.dart'
     if (dart.library.html) '../../widgets/utils/csv_download_web.dart'
     if (dart.library.io) '../../widgets/utils/csv_download_mobile.dart' as download;
+import '../services/csv/csv_service.dart';
 
 class CsvController extends ChangeNotifier {
   final CsvService _csvService;

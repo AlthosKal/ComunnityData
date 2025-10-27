@@ -2,12 +2,11 @@ package com.senasoft.comunidataapi.chat.dto.response.ai;
 
 import com.senasoft.comunidataapi.chat.dto.response.CharDataDTO;
 import com.senasoft.comunidataapi.chat.enums.ResponseType;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor

@@ -14,6 +14,13 @@ import com.senasoft.comunidataapi.csv.entity.CitizenReport;
 import com.senasoft.comunidataapi.csv.enums.ProblemCategory;
 import com.senasoft.comunidataapi.csv.enums.UrgencyLevel;
 import com.senasoft.comunidataapi.csv.enums.Zone;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -21,24 +28,14 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Servicio de funciones para ComuniData.
  *
  * <p>Gestiona la detección y ejecución de function calling para análisis de reportes ciudadanos.
  *
- * <p>NOTA IMPORTANTE: En una implementación real con Spring AI Native Function Calling,
- * este servicio puede simplificarse significativamente, ya que el modelo GPT-5 puede
- * invocar las funciones directamente sin necesidad de detección manual.
+ * <p>NOTA IMPORTANTE: En una implementación real con Spring AI Native Function Calling, este
+ * servicio puede simplificarse significativamente, ya que el modelo GPT-5 puede invocar las
+ * funciones directamente sin necesidad de detección manual.
  */
 @Service
 @Slf4j
@@ -58,8 +55,8 @@ public class FunctionServiceImpl implements FunctionService {
     /**
      * Detecta la función apropiada basándose en palabras clave del prompt.
      *
-     * <p>NOTA: Este método es un fallback. Con Spring AI Native Function Calling,
-     * GPT-5 puede elegir automáticamente la función correcta sin necesidad de esta lógica.
+     * <p>NOTA: Este método es un fallback. Con Spring AI Native Function Calling, GPT-5 puede
+     * elegir automáticamente la función correcta sin necesidad de esta lógica.
      *
      * @param prompt Texto del usuario
      * @return Nombre de la función detectada
@@ -194,7 +191,8 @@ public class FunctionServiceImpl implements FunctionService {
         contextBuilder.append("📊 CONTEXTO DE REPORTES CIUDADANOS DISPONIBLE:\n\n");
 
         if (functionData != null) {
-            contextBuilder.append("✅ Tengo acceso a los datos de reportes ciudadanos del sistema ComuniData.\n");
+            contextBuilder.append(
+                    "✅ Tengo acceso a los datos de reportes ciudadanos del sistema ComuniData.\n");
             contextBuilder
                     .append("📈 He consultado información usando: ")
                     .append(getFunctionDisplayName(functionName))
@@ -203,7 +201,10 @@ public class FunctionServiceImpl implements FunctionService {
             // Agregar información específica según el tipo de datos
             if (functionData instanceof List<?> list) {
                 int size = list.size();
-                contextBuilder.append("📋 Encontré ").append(size).append(" reportes que coinciden con tu consulta.\n");
+                contextBuilder
+                        .append("📋 Encontré ")
+                        .append(size)
+                        .append(" reportes que coinciden con tu consulta.\n");
 
                 if (size > 0) {
                     // Agregar estadísticas básicas si son reportes ciudadanos
@@ -224,12 +225,14 @@ public class FunctionServiceImpl implements FunctionService {
 
         contextBuilder.append("\n\n🎯 INSTRUCCIONES PARA LA RESPUESTA:\n");
         contextBuilder.append("- Analiza los datos de reportes ciudadanos proporcionados\n");
-        contextBuilder.append("- Si hay datos disponibles, NO menciones que necesitas más información\n");
+        contextBuilder.append(
+                "- Si hay datos disponibles, NO menciones que necesitas más información\n");
         contextBuilder.append("- Proporciona insights útiles sobre los problemas reportados\n");
         contextBuilder.append("- Identifica patrones, tendencias o áreas de preocupación\n");
         contextBuilder.append("- Sugiere acciones concretas basadas en los hallazgos\n");
         contextBuilder.append("- Usa un tono profesional, empático y orientado a soluciones\n");
-        contextBuilder.append("- Si los datos incluyen información sobre sesgos detectados, menciónalo\n");
+        contextBuilder.append(
+                "- Si los datos incluyen información sobre sesgos detectados, menciónalo\n");
 
         return contextBuilder.toString();
     }
@@ -254,7 +257,7 @@ public class FunctionServiceImpl implements FunctionService {
     private List<CitizenReport> executeFilterByAge(ChatDTO request) {
         Map<String, Integer> ageParams = extractAgeParameters(request.getPrompt());
         FilterByAgeFunction.Request functionRequest =
-            new FilterByAgeFunction.Request(ageParams.get("minAge"), ageParams.get("maxAge"));
+                new FilterByAgeFunction.Request(ageParams.get("minAge"), ageParams.get("maxAge"));
         return filterByAgeFunction.apply(functionRequest);
     }
 
@@ -267,28 +270,29 @@ public class FunctionServiceImpl implements FunctionService {
     private List<CitizenReport> executeFilterByCategory(ChatDTO request) {
         String category = extractCategoryParameter(request.getPrompt());
         FilterByCategoryProblemFunction.Request functionRequest =
-            new FilterByCategoryProblemFunction.Request(category);
+                new FilterByCategoryProblemFunction.Request(category);
         return filterByCategoryFunction.apply(functionRequest);
     }
 
     private List<CitizenReport> executeFilterByUrgency(ChatDTO request) {
         String urgency = extractUrgencyParameter(request.getPrompt());
         FilterByUrgencyLevelFunction.Request functionRequest =
-            new FilterByUrgencyLevelFunction.Request(urgency);
+                new FilterByUrgencyLevelFunction.Request(urgency);
         return filterByUrgencyFunction.apply(functionRequest);
     }
 
     private List<CitizenReport> executeFilterByGovernmentAttention(ChatDTO request) {
         Boolean hasAttention = extractGovernmentAttentionParameter(request.getPrompt());
         FilterByGovernmentAttentionFunction.Request functionRequest =
-            new FilterByGovernmentAttentionFunction.Request(hasAttention);
+                new FilterByGovernmentAttentionFunction.Request(hasAttention);
         return filterByGovernmentAttentionFunction.apply(functionRequest);
     }
 
     private List<CitizenReport> executeFilterByReportDate(ChatDTO request) {
         Map<String, String> dateParams = extractDateParameters(request.getPrompt());
         FilterByReportDateFunction.Request functionRequest =
-            new FilterByReportDateFunction.Request(dateParams.get("startDate"), dateParams.get("endDate"));
+                new FilterByReportDateFunction.Request(
+                        dateParams.get("startDate"), dateParams.get("endDate"));
         return filterByReportDateFunction.apply(functionRequest);
     }
 
@@ -300,16 +304,18 @@ public class FunctionServiceImpl implements FunctionService {
 
     private List<String> executeSemanticSearch(ChatDTO request) {
         String query = request.getPrompt();
-        SemanticSearchFunction.Request functionRequest = new SemanticSearchFunction.Request(query, 5);
+        SemanticSearchFunction.Request functionRequest =
+                new SemanticSearchFunction.Request(query, 5);
         return semanticSearchFunction.apply(functionRequest);
     }
 
     private Object executeGenerateReport(ChatDTO request) {
         String analysisType = extractAnalysisType(request.getPrompt());
-        // Los filtros se pasan como String JSON, por ahora null (pueden ser extraídos del prompt si es necesario)
+        // Los filtros se pasan como String JSON, por ahora null (pueden ser extraídos del prompt si
+        // es necesario)
         String filters = null;
         GenerateReportFunction.Request functionRequest =
-            new GenerateReportFunction.Request(analysisType, filters);
+                new GenerateReportFunction.Request(analysisType, filters);
         return generateReportFunction.apply(functionRequest);
     }
 
@@ -335,8 +341,17 @@ public class FunctionServiceImpl implements FunctionService {
 
     private String extractCityParameter(String prompt) {
         String lowerPrompt = prompt.toLowerCase();
-        List<String> cities = List.of("manizales", "bogotá", "cali", "medellín", "barranquilla",
-                                      "cartagena", "bucaramanga", "pereira", "armenia");
+        List<String> cities =
+                List.of(
+                        "manizales",
+                        "bogotá",
+                        "cali",
+                        "medellín",
+                        "barranquilla",
+                        "cartagena",
+                        "bucaramanga",
+                        "pereira",
+                        "armenia");
 
         for (String city : cities) {
             if (lowerPrompt.contains(city)) {
@@ -352,8 +367,10 @@ public class FunctionServiceImpl implements FunctionService {
         String lowerPrompt = prompt.toLowerCase();
 
         if (lowerPrompt.contains("salud")) return "SALUD";
-        if (lowerPrompt.contains("educación") || lowerPrompt.contains("educacion")) return "EDUCACION";
-        if (lowerPrompt.contains("medio ambiente") || lowerPrompt.contains("ambiental")) return "MEDIO_AMBIENTE";
+        if (lowerPrompt.contains("educación") || lowerPrompt.contains("educacion"))
+            return "EDUCACION";
+        if (lowerPrompt.contains("medio ambiente") || lowerPrompt.contains("ambiental"))
+            return "MEDIO_AMBIENTE";
         if (lowerPrompt.contains("seguridad")) return "SEGURIDAD";
 
         return "SALUD"; // Categoría por defecto
@@ -407,7 +424,8 @@ public class FunctionServiceImpl implements FunctionService {
             String lowerPrompt = prompt.toLowerCase();
             if (lowerPrompt.contains("último mes") || lowerPrompt.contains("ultimo mes")) {
                 params.put("startDate", now.minusMonths(1).toString());
-            } else if (lowerPrompt.contains("última semana") || lowerPrompt.contains("ultima semana")) {
+            } else if (lowerPrompt.contains("última semana")
+                    || lowerPrompt.contains("ultima semana")) {
                 params.put("startDate", now.minusWeeks(1).toString());
             } else if (lowerPrompt.contains("último año") || lowerPrompt.contains("ultimo ano")) {
                 params.put("startDate", now.minusYears(1).toString());
@@ -475,43 +493,59 @@ public class FunctionServiceImpl implements FunctionService {
         long withBias = 0;
 
         for (CitizenReport report : reports) {
-            if (report.getCategoriaProblema() != null) {
-                byCategory.merge(report.getCategoriaProblema(), 1L, Long::sum);
+            if (report.getCategoryProblem() != null) {
+                byCategory.merge(report.getCategoryProblem(), 1L, Long::sum);
             }
-            if (report.getNivelUrgencia() != null) {
-                byUrgency.merge(report.getNivelUrgencia(), 1L, Long::sum);
+            if (report.getUrgencyLevel() != null) {
+                byUrgency.merge(report.getUrgencyLevel(), 1L, Long::sum);
             }
-            if (report.getZona() != null) {
-                byZone.merge(report.getZona(), 1L, Long::sum);
+            if (report.getArea() != null) {
+                byZone.merge(report.getArea(), 1L, Long::sum);
             }
-            if (Boolean.FALSE.equals(report.getAtencionPreviaGobierno())) {
+            if (Boolean.FALSE.equals(report.getGovernmentPreAttention())) {
                 withoutAttention++;
             }
-            if (Boolean.TRUE.equals(report.getSesgoDetectado())) {
+            if (Boolean.TRUE.equals(report.getBiasDetected())) {
                 withBias++;
             }
         }
 
         if (!byCategory.isEmpty()) {
             contextBuilder.append("  • Por Categoría: ");
-            byCategory.forEach((cat, count) ->
-                contextBuilder.append(cat.getDisplayName()).append(" (").append(count).append("), "));
+            byCategory.forEach(
+                    (cat, count) ->
+                            contextBuilder
+                                    .append(cat.getDisplayName())
+                                    .append(" (")
+                                    .append(count)
+                                    .append("), "));
             contextBuilder.append("\n");
         }
 
         if (!byUrgency.isEmpty()) {
             contextBuilder.append("  • Por Urgencia: ");
-            byUrgency.forEach((urg, count) ->
-                contextBuilder.append(urg.getDisplayName()).append(" (").append(count).append("), "));
+            byUrgency.forEach(
+                    (urg, count) ->
+                            contextBuilder
+                                    .append(urg.getDisplayName())
+                                    .append(" (")
+                                    .append(count)
+                                    .append("), "));
             contextBuilder.append("\n");
         }
 
         if (withoutAttention > 0) {
-            contextBuilder.append("  • Sin atención del gobierno: ").append(withoutAttention).append("\n");
+            contextBuilder
+                    .append("  • Sin atención del gobierno: ")
+                    .append(withoutAttention)
+                    .append("\n");
         }
 
         if (withBias > 0) {
-            contextBuilder.append("  • ⚠️ Con sesgos detectados por IA: ").append(withBias).append("\n");
+            contextBuilder
+                    .append("  • ⚠️ Con sesgos detectados por IA: ")
+                    .append(withBias)
+                    .append("\n");
         }
 
         contextBuilder.append("\n");
@@ -519,9 +553,7 @@ public class FunctionServiceImpl implements FunctionService {
 
     private String loadPromptFromClasspath() {
         try (InputStream inputStream =
-                getClass()
-                        .getClassLoader()
-                        .getResourceAsStream("prompts/ai_prompt_template.txt")) {
+                getClass().getClassLoader().getResourceAsStream("prompts/ai_prompt_template.txt")) {
             if (inputStream == null) {
                 log.warn("Prompt template file not found, using default");
                 return "{prompt}"; // Fallback simple

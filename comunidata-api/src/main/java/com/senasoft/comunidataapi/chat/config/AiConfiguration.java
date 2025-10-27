@@ -23,7 +23,8 @@ public class AiConfiguration {
     @Description("Filtra reportes ciudadanos por rango de edad")
     public ToolCallback filterByAgeFunctionCallback(FilterByAgeFunction function) {
         return FunctionToolCallback.builder("filterByAge", function)
-                .description("Filtra reportes ciudadanos por rango de edad. Parámetros: minAge (edad mínima), maxAge (edad máxima)")
+                .description(
+                        "Filtra reportes ciudadanos por rango de edad. Parámetros: minAge (edad mínima), maxAge (edad máxima)")
                 .inputType(FilterByAgeFunction.Request.class)
                 .build();
     }
@@ -32,7 +33,8 @@ public class AiConfiguration {
     @Description("Filtra reportes ciudadanos por ciudad")
     public ToolCallback filterByCityFunctionCallback(FilterByCityFunction function) {
         return FunctionToolCallback.builder("filterByCity", function)
-                .description("Filtra reportes ciudadanos por ciudad. Parámetro: city (nombre de la ciudad)")
+                .description(
+                        "Filtra reportes ciudadanos por ciudad. Parámetro: city (nombre de la ciudad)")
                 .inputType(FilterByCityFunction.Request.class)
                 .build();
     }

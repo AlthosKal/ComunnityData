@@ -1,16 +1,15 @@
 package com.senasoft.comunidataapi.chat.service.session;
 
 import com.senasoft.comunidataapi.chat.enums.SessionState;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
@@ -45,9 +44,7 @@ public class SessionManager {
         }
     }
 
-    /**
-     * Obtiene o crea una nueva sesión para el identificador dado
-     */
+    /** Obtiene o crea una nueva sesión para el identificador dado */
     public Session getOrCreateSession(String identifier) {
         return sessions.computeIfAbsent(
                 identifier,
@@ -62,9 +59,7 @@ public class SessionManager {
                 });
     }
 
-    /**
-     * Verifica si una sesión está autenticada
-     */
+    /** Verifica si una sesión está autenticada */
     public boolean isAuthenticated(String identifier) {
         Session session = sessions.get(identifier);
         if (session == null) {
@@ -80,9 +75,7 @@ public class SessionManager {
         return session.isAuthenticated();
     }
 
-    /**
-     * Marca una sesión como autenticada
-     */
+    /** Marca una sesión como autenticada */
     public void authenticateSession(String identifier, String email, String token) {
         Session session = getOrCreateSession(identifier);
         session.setState(SessionState.AUTHENTICATED);
@@ -95,9 +88,7 @@ public class SessionManager {
         log.info("Session {} authenticated successfully for user: {}", identifier, email);
     }
 
-    /**
-     * Registra un intento fallido de autenticación
-     */
+    /** Registra un intento fallido de autenticación */
     public boolean recordFailedAttempt(String identifier) {
         Session session = getOrCreateSession(identifier);
         int newFailedAttempts = session.failedAttempts + 1;
@@ -123,32 +114,24 @@ public class SessionManager {
         return false;
     }
 
-    /**
-     * Obtiene el número de intentos fallidos restantes
-     */
+    /** Obtiene el número de intentos fallidos restantes */
     public int getRemainingAttempts(String identifier) {
         Session session = getOrCreateSession(identifier);
         return Math.max(0, MAX_FAILED_ATTEMPTS - session.failedAttempts);
     }
 
-    /**
-     * Limpia una sesión específica
-     */
+    /** Limpia una sesión específica */
     public void cleanupSession(String identifier) {
         sessions.remove(identifier);
         log.info("Session {} removed from memory", identifier);
     }
 
-    /**
-     * Obtiene la sesión completa
-     */
+    /** Obtiene la sesión completa */
     public Session getSession(String identifier) {
         return sessions.get(identifier);
     }
 
-    /**
-     * Tarea programada para limpiar sesiones expiradas
-     */
+    /** Tarea programada para limpiar sesiones expiradas */
     @Scheduled(fixedRate = 3600000) // Cada hora
     public void cleanupExpiredSessions() {
         log.info("Starting cleanup of expired sessions");

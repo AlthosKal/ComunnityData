@@ -11,26 +11,24 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO de respuesta para reportes ciudadanos.
- */
+/** DTO de respuesta para reportes ciudadanos. */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CitizenReportResponseDTO {
     private String id;
-    private Integer edad;
-    private String ciudad;
-    private String comentario;
-    private ProblemCategory categoriaProblema;
-    private UrgencyLevel nivelUrgencia;
-    private LocalDate fechaReporte;
-    private Boolean atencionPreviaGobierno;
-    private Zone zona;
-    private Boolean sesgoDetectado;
-    private String descripcionSesgo;
-    private ProcessingStatus estadoProcesamiento;
-    private LocalDateTime fechaCarga;
-    private LocalDateTime fechaProcesamiento;
+    private Integer age;
+    private String city;
+    private String comment;
+    private ProblemCategory categoryProblem;
+    private UrgencyLevel urgencyLevel;
+    private LocalDate reportDate;
+    private Boolean governmentPreAttention;
+    private Zone zone;
+    private Boolean biasDetected;
+    private String descriptionBias;
+    private ProcessingStatus processingStatus;
+    private LocalDateTime importDate;
+    private LocalDateTime processDate;
 }

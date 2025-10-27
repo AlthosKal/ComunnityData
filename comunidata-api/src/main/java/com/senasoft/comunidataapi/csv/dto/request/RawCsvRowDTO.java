@@ -18,15 +18,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RawCsvRowDTO {
     private String id;
-    private String nombre; // Se descartará por privacidad
-    private String edad;
-    private String genero; // Se descartará por privacidad
-    private String ciudad;
-    private String comentario;
-    private String categoriaProblema;
-    private String nivelUrgencia;
-    private String fechaReporte;
-    private String accesoInternet; // Se descartará
-    private String atencionPreviaGobierno;
-    private String zonaRural;
+    private String name; // Se descartará por privacidad
+    private String age;
+    private String gender; // Se descartará por privacidad
+    private String city;
+    private String comment;
+    private String categoryProblem;
+    private String urgencyLevel;
+    private String dateReport;
+    private String internetAccess; // Se descartará
+    private String governmentPreAttention;
+    private String ruralArea;
 }

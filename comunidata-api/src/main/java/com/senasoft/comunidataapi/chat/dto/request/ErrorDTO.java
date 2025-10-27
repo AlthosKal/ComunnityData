@@ -1,9 +1,8 @@
 package com.senasoft.comunidataapi.chat.dto.request;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor

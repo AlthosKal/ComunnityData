@@ -5,7 +5,6 @@ import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,23 +35,22 @@ public class CitizenChartGenerationService {
     private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
     private static final Color HEALTH_COLOR = new Color(231, 76, 60); // Rojo - Salud
     private static final Color EDUCATION_COLOR = new Color(52, 152, 219); // Azul - Educación
-    private static final Color ENVIRONMENT_COLOR = new Color(46, 204, 113); // Verde - Medio Ambiente
+    private static final Color ENVIRONMENT_COLOR =
+            new Color(46, 204, 113); // Verde - Medio Ambiente
     private static final Color SECURITY_COLOR = new Color(241, 196, 15); // Amarillo - Seguridad
 
     private static final int CHART_WIDTH = 800;
     private static final int CHART_HEIGHT = 400;
 
-    /**
-     * Genera gráfico de barras con distribución de reportes por categoría.
-     */
+    /** Genera gráfico de barras con distribución de reportes por categoría. */
     public byte[] generateCategoryDistributionChart(List<CitizenReport> reports) {
         try {
             Map<String, Long> categoryCount =
                     reports.stream()
-                            .filter(r -> r.getCategoriaProblema() != null)
+                            .filter(r -> r.getCategoryProblem() != null)
                             .collect(
                                     Collectors.groupingBy(
-                                            r -> r.getCategoriaProblema().getDisplayName(),
+                                            r -> r.getCategoryProblem().getDisplayName(),
                                             Collectors.counting()));
 
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
@@ -82,17 +80,15 @@ public class CitizenChartGenerationService {
         }
     }
 
-    /**
-     * Genera gráfico de torta con distribución por nivel de urgencia.
-     */
+    /** Genera gráfico de torta con distribución por nivel de urgencia. */
     public byte[] generateUrgencyLevelPieChart(List<CitizenReport> reports) {
         try {
             Map<String, Long> urgencyCount =
                     reports.stream()
-                            .filter(r -> r.getNivelUrgencia() != null)
+                            .filter(r -> r.getUrgencyLevel() != null)
                             .collect(
                                     Collectors.groupingBy(
-                                            r -> r.getNivelUrgencia().getDisplayName(),
+                                            r -> r.getUrgencyLevel().getDisplayName(),
                                             Collectors.counting()));
 
             DefaultPieDataset dataset = new DefaultPieDataset();
@@ -125,17 +121,15 @@ public class CitizenChartGenerationService {
         }
     }
 
-    /**
-     * Genera gráfico de barras horizontales con top 10 ciudades con más reportes.
-     */
+    /** Genera gráfico de barras horizontales con top 10 ciudades con más reportes. */
     public byte[] generateTopCitiesChart(List<CitizenReport> reports) {
         try {
             Map<String, Long> cityCount =
                     reports.stream()
-                            .filter(r -> r.getCiudad() != null)
+                            .filter(r -> r.getCity() != null)
                             .collect(
                                     Collectors.groupingBy(
-                                            CitizenReport::getCiudad, Collectors.counting()));
+                                            CitizenReport::getCity, Collectors.counting()));
 
             // Top 10 ciudades
             Map<String, Long> topCities =
@@ -175,17 +169,15 @@ public class CitizenChartGenerationService {
         }
     }
 
-    /**
-     * Genera gráfico de línea con tendencia temporal de reportes.
-     */
+    /** Genera gráfico de línea con tendencia temporal de reportes. */
     public byte[] generateTimeTrendChart(List<CitizenReport> reports) {
         try {
             Map<LocalDate, Long> dateCount =
                     reports.stream()
-                            .filter(r -> r.getFechaReporte() != null)
+                            .filter(r -> r.getReportDate() != null)
                             .collect(
                                     Collectors.groupingBy(
-                                            CitizenReport::getFechaReporte, Collectors.counting()));
+                                            CitizenReport::getReportDate, Collectors.counting()));
 
             TimeSeries series = new TimeSeries("Reportes Ciudadanos");
 
@@ -214,17 +206,15 @@ public class CitizenChartGenerationService {
         }
     }
 
-    /**
-     * Genera gráfico de barras comparando zona rural vs urbana.
-     */
+    /** Genera gráfico de barras comparando zona rural vs urbana. */
     public byte[] generateRuralUrbanComparisonChart(List<CitizenReport> reports) {
         try {
             Map<String, Long> zoneCount =
                     reports.stream()
-                            .filter(r -> r.getZona() != null)
+                            .filter(r -> r.getArea() != null)
                             .collect(
                                     Collectors.groupingBy(
-                                            r -> r.getZona().getDisplayName(),
+                                            r -> r.getArea().getDisplayName(),
                                             Collectors.counting()));
 
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
@@ -235,10 +225,7 @@ public class CitizenChartGenerationService {
 
             JFreeChart chart =
                     ChartFactory.createBarChart(
-                            "Comparación Rural vs Urbana",
-                            "Zona",
-                            "Cantidad de Reportes",
-                            dataset);
+                            "Comparación Rural vs Urbana", "Zona", "Cantidad de Reportes", dataset);
 
             customizeChart(chart);
 
@@ -253,25 +240,23 @@ public class CitizenChartGenerationService {
         }
     }
 
-    /**
-     * Genera gráfico de torta con atención previa del gobierno.
-     */
+    /** Genera gráfico de torta con atención previa del gobierno. */
     public byte[] generateGovernmentAttentionChart(List<CitizenReport> reports) {
         try {
             long withAttention =
                     reports.stream()
                             .filter(
                                     r ->
-                                            r.getAtencionPreviaGobierno() != null
-                                                    && r.getAtencionPreviaGobierno())
+                                            r.getGovernmentPreAttention() != null
+                                                    && r.getGovernmentPreAttention())
                             .count();
 
             long withoutAttention =
                     reports.stream()
                             .filter(
                                     r ->
-                                            r.getAtencionPreviaGobierno() != null
-                                                    && !r.getAtencionPreviaGobierno())
+                                            r.getGovernmentPreAttention() != null
+                                                    && !r.getGovernmentPreAttention())
                             .count();
 
             DefaultPieDataset dataset = new DefaultPieDataset();
@@ -298,9 +283,7 @@ public class CitizenChartGenerationService {
 
     // ==================== Helper Methods ====================
 
-    /**
-     * Personaliza el estilo general del gráfico.
-     */
+    /** Personaliza el estilo general del gráfico. */
     private void customizeChart(JFreeChart chart) {
         chart.setBackgroundPaint(Color.WHITE);
         chart.getTitle().setPaint(Color.BLACK);
@@ -314,9 +297,7 @@ public class CitizenChartGenerationService {
         }
     }
 
-    /**
-     * Convierte un JFreeChart a array de bytes.
-     */
+    /** Convierte un JFreeChart a array de bytes. */
     private byte[] chartToByteArray(JFreeChart chart) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ChartUtils.writeChartAsPNG(baos, chart, CHART_WIDTH, CHART_HEIGHT);

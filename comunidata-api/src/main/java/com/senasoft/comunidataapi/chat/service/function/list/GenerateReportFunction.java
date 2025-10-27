@@ -31,7 +31,10 @@ public class GenerateReportFunction implements Function<GenerateReportFunction.R
 
     @Override
     public String apply(Request request) {
-        log.info("Generating report. Analysis type: {}, Filters: {}", request.analysisType(), request.filters());
+        log.info(
+                "Generating report. Analysis type: {}, Filters: {}",
+                request.analysisType(),
+                request.filters());
 
         // Obtener reportes completados
         List<CitizenReport> reports = repository.findAllCompletedReports();
@@ -40,12 +43,12 @@ public class GenerateReportFunction implements Function<GenerateReportFunction.R
         // TODO: Implementar lógica de filtros JSON cuando sea necesario
 
         // Generar mensaje de respuesta
-        String message = String.format(
-                "Reporte de tipo '%s' generado exitosamente con %d reportes ciudadanos. " +
-                "El reporte PDF está siendo generado con análisis dinámico de IA y métricas detalladas. " +
-                "Incluye: resumen ejecutivo, distribución por categoría, nivel de urgencia, y análisis de zonas.",
-                request.analysisType(),
-                reports.size());
+        String message =
+                String.format(
+                        "Reporte de tipo '%s' generado exitosamente con %d reportes ciudadanos. "
+                                + "El reporte PDF está siendo generado con análisis dinámico de IA y métricas detalladas. "
+                                + "Incluye: resumen ejecutivo, distribución por categoría, nivel de urgencia, y análisis de zonas.",
+                        request.analysisType(), reports.size());
 
         log.info("Report generation requested successfully. Total reports: {}", reports.size());
 

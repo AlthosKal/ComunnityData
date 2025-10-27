@@ -1,9 +1,8 @@
 package com.senasoft.comunidataapi.chat.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Getter
 @Setter

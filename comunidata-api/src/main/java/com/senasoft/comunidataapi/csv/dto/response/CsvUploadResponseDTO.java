@@ -5,18 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO de respuesta para la carga de CSV.
- */
+/** DTO de respuesta para la carga de CSV. */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CsvUploadResponseDTO {
-    private String mensaje;
-    private Integer totalRegistros;
-    private Integer registrosNormalizados;
-    private Integer registrosConError;
+    private String message;
+    private Integer totalRecords;
+    private Integer normalizedRecords;
+    private Integer recordsWithErros;
     private String batchId;
-    private String estadoProcesamiento;
+    private String processingStatus;
 }

@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
-import '../services/chat_service.dart';
+
 import '../../dto/chat/request/chat_dto.dart';
-import '../../dto/chat/request/chat_history_dto.dart';
 import '../../dto/chat/response/base_dynamic_response_dto.dart';
-import '../../dto/chat/response/simple_text_response_dto.dart';
 import '../../dto/chat/response/report_download_response_dto.dart';
+import '../../dto/chat/response/simple_text_response_dto.dart';
+import '../services/chat/chat_service.dart';
 
 class AIChatController with ChangeNotifier {
   final ChatService _chatService;

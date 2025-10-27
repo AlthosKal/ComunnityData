@@ -3,7 +3,6 @@ package com.senasoft.comunidataapi.chat.service.chat;
 import com.senasoft.comunidataapi.chat.dto.request.*;
 import com.senasoft.comunidataapi.chat.dto.response.DynamicAnalysisResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
-
 import java.util.List;
 
 public interface ChatService {

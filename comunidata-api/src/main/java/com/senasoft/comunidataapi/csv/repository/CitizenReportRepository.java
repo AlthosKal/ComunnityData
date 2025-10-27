@@ -11,9 +11,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
-/**
- * Repository para operaciones CRUD sobre reportes ciudadanos.
- */
+/** Repository para operaciones CRUD sobre reportes ciudadanos. */
 @Repository
 public interface CitizenReportRepository extends MongoRepository<CitizenReport, String> {
 
@@ -53,11 +51,9 @@ public interface CitizenReportRepository extends MongoRepository<CitizenReport, 
     List<CitizenReport> findBySesgoDetectado(Boolean sesgoDetectado);
 
     /** Consultas combinadas */
-    List<CitizenReport> findByCategoriaProblemaAndZona(
-            ProblemCategory categoria, Zone zona);
+    List<CitizenReport> findByCategoriaProblemaAndZona(ProblemCategory categoria, Zone zona);
 
-    List<CitizenReport> findByCiudadAndCategoriaProblema(
-            String ciudad, ProblemCategory categoria);
+    List<CitizenReport> findByCiudadAndCategoriaProblema(String ciudad, ProblemCategory categoria);
 
     List<CitizenReport> findByZonaAndNivelUrgencia(Zone zona, UrgencyLevel urgencia);
 

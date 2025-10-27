@@ -1,9 +1,7 @@
 package com.senasoft.comunidataapi.csv.service;
 
-import com.senasoft.comunidataapi.csv.dto.response.BatchProcessingStatusDTO;
 import com.senasoft.comunidataapi.csv.dto.response.CitizenReportResponseDTO;
 import com.senasoft.comunidataapi.csv.dto.response.CsvUploadResponseDTO;
-import java.io.InputStream;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,26 +30,10 @@ public interface CsvProcessingOrchestrator {
     List<CitizenReportResponseDTO> getAllProcessedReports();
 
     /**
-     * Obtiene un reporte específico por ID.
-     *
-     * @param id ID del reporte
-     * @return Reporte ciudadano
-     */
-    CitizenReportResponseDTO getReportById(String id);
-
-    /**
      * Exporta reportes filtrados como CSV.
      *
      * @param reportIds IDs de los reportes a exportar (null = todos)
      * @return Contenido del CSV como bytes
      */
     byte[] exportReportsAsCsv(List<String> reportIds);
-
-    /**
-     * Obtiene el estado del procesamiento de un batch.
-     *
-     * @param batchId ID del batch
-     * @return Estado del procesamiento
-     */
-    BatchProcessingStatusDTO getBatchStatus(String batchId);
 }

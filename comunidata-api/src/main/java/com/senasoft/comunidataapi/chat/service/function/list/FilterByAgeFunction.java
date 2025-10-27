@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class FilterByAgeFunction implements Function<FilterByAgeFunction.Request, List<CitizenReport>> {
+public class FilterByAgeFunction
+        implements Function<FilterByAgeFunction.Request, List<CitizenReport>> {
 
     private final CitizenReportRepository repository;
 

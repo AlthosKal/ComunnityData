@@ -2,9 +2,10 @@ package com.senasoft.comunidataapi.chat.controller;
 
 import com.senasoft.comunidataapi.chat.dto.request.ChatHistoryDTO;
 import com.senasoft.comunidataapi.chat.dto.request.ChatHistoryForConversationDTO;
-import com.senasoft.comunidataapi.exception.ApiResponse;
 import com.senasoft.comunidataapi.chat.service.chat.ChatService;
+import com.senasoft.comunidataapi.exception.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,13 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/v1/chat/history")
 @RequiredArgsConstructor
 @CrossOrigin
-public class ChatHistoryController  {
+public class ChatHistoryController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatHistoryController.class);
     private final ChatService chatService;

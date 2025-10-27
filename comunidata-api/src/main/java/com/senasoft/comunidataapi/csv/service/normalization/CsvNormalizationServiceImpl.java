@@ -72,23 +72,21 @@ public class CsvNormalizationServiceImpl implements CsvNormalizationService {
     @Override
     public CitizenReport normalizeRow(RawCsvRowDTO rawRow, String batchId, Integer batchIndex) {
         return CitizenReport.builder()
-                .edad(normalizeEdad(rawRow.getEdad()))
-                .ciudad(normalizeCiudad(rawRow.getCiudad()))
-                .comentario(normalizeComentario(rawRow.getComentario()))
-                .comentarioOriginal(rawRow.getComentario()) // Guardar original para auditoría
-                .categoriaProblema(
-                        ProblemCategory.fromString(rawRow.getCategoriaProblema()))
-                .categoriaOriginal(rawRow.getCategoriaProblema())
-                .nivelUrgencia(UrgencyLevel.fromString(rawRow.getNivelUrgencia()))
-                .fechaReporte(normalizeFecha(rawRow.getFechaReporte()))
-                .atencionPreviaGobierno(
-                        normalizeBoolean(rawRow.getAtencionPreviaGobierno()))
-                .zona(normalizeZona(rawRow.getZonaRural()))
-                .estadoProcesamiento(ProcessingStatus.PENDIENTE)
-                .fechaCarga(LocalDateTime.now())
+                .age(normalizeEdad(rawRow.getAge()))
+                .city(normalizeCiudad(rawRow.getCity()))
+                .comment(normalizeComentario(rawRow.getComment()))
+                .originalComment(rawRow.getComment()) // Guardar original para auditoría
+                .categoryProblem(ProblemCategory.fromString(rawRow.getCategoryProblem()))
+                .originalCategory(rawRow.getCategoryProblem())
+                .urgencyLevel(UrgencyLevel.fromString(rawRow.getUrgencyLevel()))
+                .reportDate(normalizeFecha(rawRow.getDateReport()))
+                .governmentPreAttention(normalizeBoolean(rawRow.getGovernmentPreAttention()))
+                .area(normalizeZona(rawRow.getRuralArea()))
+                .processingStatus(ProcessingStatus.PENDIENTE)
+                .importDate(LocalDateTime.now())
                 .batchId(batchId)
                 .batchIndex(batchIndex)
-                .sesgoDetectado(false) // Se actualizará después del procesamiento IA
+                .biasDetected(false) // Se actualizará después del procesamiento IA
                 .build();
     }
 
@@ -208,9 +206,7 @@ public class CsvNormalizationServiceImpl implements CsvNormalizationService {
         };
     }
 
-    /**
-     * Normaliza zona: - Convierte "Zona rural" a enum Zone - "0" | "1" → RURAL | URBANA
-     */
+    /** Normaliza zona: - Convierte "Zona rural" a enum Zone - "0" | "1" → RURAL | URBANA */
     private Zone normalizeZona(String zonaRural) {
         if (zonaRural == null || zonaRural.trim().isEmpty()) {
             return null;
@@ -231,9 +227,9 @@ public class CsvNormalizationServiceImpl implements CsvNormalizationService {
     /**
      * Parsea una línea del CSV en un objeto RawCsvRowDTO.
      *
-     * <p>Estructura esperada: ID, Nombre, Edad, Género, Ciudad, Comentario, Categoría del
-     * problema, Nivel de urgencia, Fecha del reporte, Acceso a internet, Atención previa del
-     * gobierno, Zona rural
+     * <p>Estructura esperada: ID, Nombre, Edad, Género, Ciudad, Comentario, Categoría del problema,
+     * Nivel de urgencia, Fecha del reporte, Acceso a internet, Atención previa del gobierno, Zona
+     * rural
      */
     private RawCsvRowDTO parseCsvLine(String line) {
         // Split considerando que puede haber comas dentro de campos entre comillas
@@ -246,17 +242,17 @@ public class CsvNormalizationServiceImpl implements CsvNormalizationService {
 
         return RawCsvRowDTO.builder()
                 .id(getField(fields, 0))
-                .nombre(getField(fields, 1))
-                .edad(getField(fields, 2))
-                .genero(getField(fields, 3))
-                .ciudad(getField(fields, 4))
-                .comentario(getField(fields, 5))
-                .categoriaProblema(getField(fields, 6))
-                .nivelUrgencia(getField(fields, 7))
-                .fechaReporte(getField(fields, 8))
-                .accesoInternet(getField(fields, 9))
-                .atencionPreviaGobierno(getField(fields, 10))
-                .zonaRural(getField(fields, 11))
+                .name(getField(fields, 1))
+                .age(getField(fields, 2))
+                .gender(getField(fields, 3))
+                .city(getField(fields, 4))
+                .comment(getField(fields, 5))
+                .categoryProblem(getField(fields, 6))
+                .urgencyLevel(getField(fields, 7))
+                .dateReport(getField(fields, 8))
+                .internetAccess(getField(fields, 9))
+                .governmentPreAttention(getField(fields, 10))
+                .ruralArea(getField(fields, 11))
                 .build();
     }
 
@@ -264,12 +260,9 @@ public class CsvNormalizationServiceImpl implements CsvNormalizationService {
         return index < fields.length ? fields[index] : null;
     }
 
-    /**
-     * Normaliza texto removiendo acentos (útil para búsquedas).
-     */
+    /** Normaliza texto removiendo acentos (útil para búsquedas). */
     private String removeAccents(String text) {
         if (text == null) return null;
-        return Normalizer.normalize(text, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "");
+        return Normalizer.normalize(text, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
     }
 }

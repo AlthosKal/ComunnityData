@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class FilterByCityFunction implements Function<FilterByCityFunction.Request, List<CitizenReport>> {
+public class FilterByCityFunction
+        implements Function<FilterByCityFunction.Request, List<CitizenReport>> {
 
     private final CitizenReportRepository repository;
 

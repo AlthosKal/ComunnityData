@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
+
 import 'core/controllers/ai_chat_controller.dart';
 import 'core/controllers/csv_controller.dart';
 import 'screens/ai_analysis_view.dart';

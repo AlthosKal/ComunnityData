@@ -2,10 +2,10 @@ package com.senasoft.comunidataapi.chat.controller;
 
 import com.senasoft.comunidataapi.chat.dto.request.ChatDTO;
 import com.senasoft.comunidataapi.chat.dto.response.DynamicAnalysisResponseDTO;
-import com.senasoft.comunidataapi.exception.ApiResponse;
 import com.senasoft.comunidataapi.chat.service.chat.ChatService;
 import com.senasoft.comunidataapi.chat.service.function.list.ConversationIdService;
 import com.senasoft.comunidataapi.chat.service.report.ReportGenerationService;
+import com.senasoft.comunidataapi.exception.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
